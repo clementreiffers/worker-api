@@ -24,19 +24,19 @@ const addArtist = (artists: ArtistListType) =>
 		okResponse,
 	)(req.params.artist);
 
-// Const _isArtistExist = (artistList: ArtistListType) =>
-// 	(artist: string): boolean => {
-// 		const verify = R.pipe(
-// 			R.pluck('name'),
-// 			R.includes(artist),
-// 		)(artistList);
-//
-// 		return true;
-// 	};
+const _isArtistExist = (artistList: ArtistListType) =>
+	(artist: string): boolean =>
+		R.pipe(
+			(artistList: ArtistListType): ArtistListType => artistList, // Todo : Comprends pas pourquoi ts m'oblige ça
+			R.pluck('name'),
+			R.includes(artist),
+		)(artistList);
 
-const getArtist = (artists: ArtistListType) =>
+const getArtist = (artistList: ArtistListType) =>
 	(req: UrlQueryType): Response => R.pipe(
 		decodeURIComponent,
+		_isArtistExist(artistList),
+		String,
 		okResponse,
 	)(req.params.artist);
 
