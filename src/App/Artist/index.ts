@@ -43,11 +43,11 @@ const _isArtistSearched = (artistSearched: string) =>
 const getArtist = (artistList: ArtistListType) =>
 	(req: UrlQueryType) => {
 		const artistSearched = decodeURIComponent(req.params.artist);
-		const artistFound: ArtistListType = R.pipe(
-			R.filter((e: ArtistType) => _isArtistSearched(artistSearched)(e.name)),
+		return R.pipe(
+			R.filter((artistStored: ArtistType) => _isArtistSearched(artistSearched)(artistStored.name)),
+			JSON.stringify,
+			okResponse,
 		)(artistList);
-
-		return okResponse(JSON.stringify(artistFound));
 	};
 
 const getAllArtists = (artistList: ArtistListType) => (): Response =>
