@@ -7,15 +7,16 @@ const _artistFactory = (artist: string): ArtistType => R.applySpec({
 	name: R.identity, musicList: undefined,
 })(artist) as ArtistType;
 
-const _registerArtist = (artistList: ArtistListType) =>
-	(artist: ArtistType): string => {
-		artistList.push(artist);
-		return 'artist ' + artist.name + ' added!';
-	};
-
 const _computeAddArtist = (artistList: ArtistListType) =>
-	(artist: string): string =>
-		R.pipe(_artistFactory, _registerArtist(artistList))(artist);
+	(artist: string): boolean =>
+		R.ifElse(
+			_isArtistExist(artistList),
+			R.F,
+			() => {
+				R.append(_artistFactory(artist), artistList);
+				return true;
+			},
+		)(artist);
 
 const _isArtistExist = (artistList: ArtistListType) =>
 	(artist: string): boolean =>
@@ -29,14 +30,14 @@ const addArtist = (artists: ArtistListType) =>
 	(req: UrlQueryType): Response => R.pipe(
 		decodeURIComponent,
 		_computeAddArtist(artists),
+		String,
 		okResponse,
 	)(req.params.artist);
 
 const getArtist = (artistList: ArtistListType) =>
 	(req: UrlQueryType): Response => R.pipe(
 		decodeURIComponent,
-		_isArtistExist(artistList),
-		String,
+		// (artist: string): string[] => R.pluck(artist, artistList),
 		okResponse,
 	)(req.params.artist);
 
