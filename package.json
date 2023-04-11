@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@types/ramda": "^0.28.24",
-    "itty-router": "^3.0.12"
+    "itty-router": "^3.0.12",
+    "ramda": "^0.29.0"
   }
 }
