@@ -40,23 +40,12 @@ const _isArtistSearched = (artistSearched: string) =>
 	(artistName: string): boolean =>
 		artistName.toLowerCase().includes(artistSearched.toLowerCase());
 
-// Const getArtist = (artistList: ArtistListType) =>
-// 	(req: UrlQueryType): Response => R.pipe(
-// 		decodeURIComponent,
-// 		(artist: string): string => R.filter(_isArtistSearched(artist), artistList),
-// 		okResponse,
-// 	)(req.params.artist);
-
 const getArtist = (artistList: ArtistListType) =>
-	(req: UrlQueryType): Response => {
-		const artistFound = [];
+	(req: UrlQueryType) => {
 		const artistSearched = decodeURIComponent(req.params.artist);
-		for (const e of artistList) {
-			console.log(e);
-			if (_isArtistSearched(artistSearched)(e.name)) {
-				artistFound.push(e);
-			}
-		}
+		const artistFound: ArtistListType = R.pipe(
+			R.filter((e: ArtistType) => _isArtistSearched(artistSearched)(e.name)),
+		)(artistList);
 
 		return okResponse(JSON.stringify(artistFound));
 	};
