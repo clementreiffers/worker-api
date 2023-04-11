@@ -40,4 +40,11 @@ const getArtist = (artistList: ArtistListType) =>
 		okResponse,
 	)(req.params.artist);
 
-export {addArtist, getArtist};
+const getAllArtists = (artistList: ArtistListType) =>
+	(req: UrlQueryType): Response => R.pipe(
+		R.pluck('name'),
+		JSON.stringify,
+		okResponse,
+	)(artistList);
+
+export {addArtist, getArtist, getAllArtists};
