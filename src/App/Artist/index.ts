@@ -17,13 +17,6 @@ const _computeAddArtist = (artistList: ArtistListType) =>
 	(artist: string): string =>
 		R.pipe(_artistFactory, _registerArtist(artistList))(artist);
 
-const addArtist = (artists: ArtistListType) =>
-	(req: UrlQueryType): Response => R.pipe(
-		decodeURIComponent,
-		_computeAddArtist(artists),
-		okResponse,
-	)(req.params.artist);
-
 const _isArtistExist = (artistList: ArtistListType) =>
 	(artist: string): boolean =>
 		R.pipe(
@@ -31,6 +24,13 @@ const _isArtistExist = (artistList: ArtistListType) =>
 			R.pluck('name'),
 			R.includes(artist),
 		)(artistList);
+
+const addArtist = (artists: ArtistListType) =>
+	(req: UrlQueryType): Response => R.pipe(
+		decodeURIComponent,
+		_computeAddArtist(artists),
+		okResponse,
+	)(req.params.artist);
 
 const getArtist = (artistList: ArtistListType) =>
 	(req: UrlQueryType): Response => R.pipe(
@@ -40,8 +40,8 @@ const getArtist = (artistList: ArtistListType) =>
 		okResponse,
 	)(req.params.artist);
 
-const getAllArtists = (artistList: ArtistListType) =>
-	(req: UrlQueryType): Response => R.pipe(
+const getAllArtists = (artistList: ArtistListType) => (): Response =>
+	R.pipe(
 		R.pluck('name'),
 		JSON.stringify,
 		okResponse,
