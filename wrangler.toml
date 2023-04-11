@@ -1,0 +1,3 @@
+name = "hello"
+main = "src/artist.ts"
+compatibility_date = "2023-04-11"
