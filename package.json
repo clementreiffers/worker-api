@@ -23,6 +23,7 @@
     "@types/ramda": "^0.28.24",
     "itty-router": "^3.0.12",
     "mongoose": "^7.0.3",
-    "ramda": "^0.29.0"
+    "ramda": "^0.29.0",
+    "realm-web": "^2.0.0"
   }
 }

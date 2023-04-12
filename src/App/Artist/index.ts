@@ -2,7 +2,6 @@ import {type ArtistListType, type ArtistType} from './types';
 import * as R from 'ramda';
 import {okResponse} from '../Response';
 import {type UrlQueryType} from '../Response/types';
-import {pushArtistToMongo} from '../Mongo';
 
 const _artistFactory = (artist: string): ArtistType => R.applySpec({
 	name: R.identity, musicList: undefined,
@@ -11,8 +10,8 @@ const _artistFactory = (artist: string): ArtistType => R.applySpec({
 const _computeAddArtist = (artistList: ArtistListType) =>
 	(artist: string): boolean => R.pipe(
 		_artistFactory,
-		// R.tap((artistCreated: ArtistType) => artistList.push(artistCreated)),
-		pushArtistToMongo,
+		R.tap((artistCreated: ArtistType) => artistList.push(artistCreated)),
+		// PushArtistToMongo,
 		R.T,
 	)(artist);
 

@@ -1,41 +1,32 @@
-import mongoose from 'mongoose';
-import {Schema} from 'mongoose';
-import {type ArtistType} from '../Artist/types';
-import {mongoUrl} from './mongoConstant';
+import Realm from 'realm-web';
 
-const _connectMongo = () => {
-	void mongoose.connect(mongoUrl);
-	mongoose.connection.on('connected', () => {
-		console.log('Connected to Mongo!!');
-	});
-	mongoose.connection.on('error', () => {
-		console.log('not connected to Mongo...');
-	});
+const appId = 'cloudflare-rlmbr';
+const atlasService = 'mongodb-atlas';
+const app = new Realm.App({id: appId});
+
+const login = async () => {
+	const credentials = Realm.Credentials.anonymous();
+	try {
+		const user = await app.logIn(credentials);
+	} catch (error) {
+		console.log(error);
+	}
 };
 
-const _isMongoConnected = () =>
-	mongoose.connection.readyState === 1;
+const findArtists = async () => {
+	await login();
+	let artists;
+	try {
+		artists = app.currentUser
+			?.mongoClient(atlasService)
+			?.db('Artists')
+			?.collection('artists');
+		console.log(artists);
+	} catch (err) {
+		console.error('need to login first', err);
+	}
 
-const _connectIfNotConnected = (): void => {
-	_connectMongo();
+	return artists;
 };
 
-const schema = new Schema({
-	name: {type: String, required: true},
-	musicList: String,
-});
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const MongoArtist = mongoose.model('MongoArtist', schema);
-
-const _saveArtist = async (artist: ArtistType) =>
-	new MongoArtist(artist).save().catch(console.log);
-
-_connectIfNotConnected();
-
-const pushArtistToMongo = (artist: ArtistType): void => {
-	_connectIfNotConnected();
-	void _saveArtist(artist);
-};
-
-export {pushArtistToMongo};
+export {findArtists};

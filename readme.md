@@ -33,6 +33,5 @@ it has 4 routes:
 
 ### MongoDB
 
-Mongo doesn't work for now, Workers only accepts HTTP requests and Mongo use TCP/UDP connections.
-if an api is implemented to manage Mongo with HTTP requests it become possible.
-
+We cannot use MongoDB directly because Workers only supports HTTP requests, we need to follow this 
+[link](https://www.mongodb.com/developer/products/atlas/cloudflare-worker-rest-api/)
