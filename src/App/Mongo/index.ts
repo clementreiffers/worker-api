@@ -1,26 +1,23 @@
 import mongoose from 'mongoose';
 import {Schema} from 'mongoose';
 import {type ArtistType} from '../Artist/types';
-import {MONGO_URL} from './mongoConstant';
+import {mongoUrl} from './mongoConstant';
 
 const _connectMongo = () => {
-	mongoose.connect(MONGO_URL)
-		.then(() => {
-			console.log('connected to the database!');
-		},
-		)
-		.catch(err => {
-			console.log(err);
-		});
+	void mongoose.connect(mongoUrl);
+	mongoose.connection.on('connected', () => {
+		console.log('Connected to Mongo!!');
+	});
+	mongoose.connection.on('error', () => {
+		console.log('not connected to Mongo...');
+	});
 };
 
 const _isMongoConnected = () =>
 	mongoose.connection.readyState === 1;
 
 const _connectIfNotConnected = (): void => {
-	if (!_isMongoConnected) {
-		_connectMongo();
-	}
+	_connectMongo();
 };
 
 const schema = new Schema({
@@ -33,6 +30,8 @@ const MongoArtist = mongoose.model('MongoArtist', schema);
 
 const _saveArtist = async (artist: ArtistType) =>
 	new MongoArtist(artist).save().catch(console.log);
+
+_connectIfNotConnected();
 
 const pushArtistToMongo = (artist: ArtistType): void => {
 	_connectIfNotConnected();
