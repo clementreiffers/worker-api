@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
-import {MONGODB_URL} from '../../constants';
 import {Schema} from 'mongoose';
 import {type ArtistType} from '../Artist/types';
+import {MONGO_URL} from './mongoConstant';
 
 const _connectMongo = () => {
-	mongoose.connect(MONGODB_URL)
+	mongoose.connect(MONGO_URL)
 		.then(() => {
 			console.log('connected to the database!');
 		},
@@ -34,9 +34,9 @@ const MongoArtist = mongoose.model('MongoArtist', schema);
 const _saveArtist = async (artist: ArtistType) =>
 	new MongoArtist(artist).save().catch(console.log);
 
-const pushArtist = (artist: ArtistType): void => {
+const pushArtistToMongo = (artist: ArtistType): void => {
 	_connectIfNotConnected();
 	void _saveArtist(artist);
 };
 
-export {pushArtist};
+export {pushArtistToMongo};
