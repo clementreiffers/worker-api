@@ -1,6 +1,6 @@
 type ArtistType = {
 	name: string;
-	musicList: string[] | undefined;
+	musicList?: string[];
 };
 
 type ArtistListType = ArtistType[];

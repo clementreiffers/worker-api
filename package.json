@@ -19,8 +19,11 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@types/mongoose": "^5.11.97",
     "@types/ramda": "^0.28.24",
     "itty-router": "^3.0.12",
-    "ramda": "^0.29.0"
+    "mongoose": "^7.0.3",
+    "ramda": "^0.29.0",
+    "realm-web": "^2.0.0"
   }
 }

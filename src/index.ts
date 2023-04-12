@@ -2,6 +2,7 @@ import {Router} from 'itty-router';
 import type {ArtistListType} from './App/Artist/types';
 import {addArtist, getAllArtists, getArtist} from './App/Artist';
 import {notFound, okResponse} from './App/Response';
+import {findArtists} from './App/Mongo';
 
 const artists: ArtistListType = [];
 
@@ -15,5 +16,7 @@ router.get('/showArtist/:artist', getArtist(artists));
 router.get('/addArtist/:artist', addArtist(artists));
 router.get('/getAllArtists', getAllArtists(artists));
 router.all('*', notFound);
+
+void findArtists();
 
 export default {fetch: router.handle};

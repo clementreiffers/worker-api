@@ -11,6 +11,7 @@ const _computeAddArtist = (artistList: ArtistListType) =>
 	(artist: string): boolean => R.pipe(
 		_artistFactory,
 		R.tap((artistCreated: ArtistType) => artistList.push(artistCreated)),
+		// PushArtistToMongo,
 		R.T,
 	)(artist);
 
