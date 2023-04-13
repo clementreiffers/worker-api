@@ -2,7 +2,9 @@ import {Router} from 'itty-router';
 import type {ArtistListType} from './App/Artist/types';
 import {addArtist, getAllArtists, getArtist} from './App/Artist';
 import {notFound, okResponse} from './App/Response';
-import {findArtists} from './App/Mongo';
+import {type Env} from './types';
+import {Client} from '@neondatabase/serverless';
+import {getAllArtistsFromNeon} from './App/Neon';
 
 const artists: ArtistListType = [];
 
@@ -11,12 +13,18 @@ const router = Router(); // No "new", as this is not a real class
 
 const helloWorld = (): Response => okResponse('helloworld');
 
-router.get('/helloworld', helloWorld);
-router.get('/showArtist/:artist', getArtist(artists));
-router.get('/addArtist/:artist', addArtist(artists));
-router.get('/getAllArtists', getAllArtists(artists));
-router.all('*', notFound);
+const createAndHandleRouter = async (request: Request, env: Env, ctx: ExecutionContext) => {
+	const client = new Client(env.DATABASE_URL);
+	await client.connect();
+	const allArtists = await getAllArtistsFromNeon(client);
 
-void findArtists();
+	router.get('/helloworld', helloWorld);
+	router.get('/showArtist/:artist', getArtist(artists));
+	router.get('/addArtist/:artist', addArtist(artists));
+	router.get('/getAllArtists', getAllArtists(allArtists));
+	router.all('*', notFound);
 
-export default {fetch: router.handle};
+	return router.handle(request, env, ctx);
+};
+
+export default {fetch: createAndHandleRouter};

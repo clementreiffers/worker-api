@@ -2,6 +2,8 @@ import {type ArtistListType, type ArtistType} from './types';
 import * as R from 'ramda';
 import {okResponse} from '../Response';
 import {type UrlQueryType} from '../Response/types';
+import {type Client} from '@neondatabase/serverless';
+import {getAllArtistsFromNeon} from '../Neon';
 
 const _artistFactory = (artist: string): ArtistType => R.applySpec({
 	name: R.identity, musicList: undefined,
@@ -47,15 +49,15 @@ const getArtist = (artistList: ArtistListType) =>
 		return R.pipe(
 			R.filter((artistStored: ArtistType) => _isArtistSearched(artistSearched)(artistStored.name)),
 			JSON.stringify,
+			R.tap(console.log),
 			okResponse,
 		)(artistList);
 	};
 
-const getAllArtists = (artistList: ArtistListType) => (): Response =>
-	R.pipe(
-		R.pluck('name'),
-		JSON.stringify,
-		okResponse,
-	)(artistList);
+const getAllArtists = (artistList: ArtistListType) => (): Response => R.pipe(
+	R.pluck('name'),
+	JSON.stringify,
+	okResponse,
+)(artistList);
 
 export {addArtist, getArtist, getAllArtists};
