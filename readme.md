@@ -10,11 +10,15 @@ it serves to see all the limits and possibilities.
 3. [Explanation](#explanation)
    1. [The API](#the-api)
    2. [MongoDB](#mongodb)
+   3. [NeonDB](#neondb)
 
 
 ## Install it
 
 run `yarn` or `npm install` depending on which package manager you use.
+
+then you have to put a secret to wrangler to be able to communicate with the DB as below:
+`yarn wrangler secret put DATABASE_URL`. This command will ask you the value of this secret, so put it.
 
 ## Run it
 
@@ -35,3 +39,9 @@ it has 4 routes:
 
 We cannot use MongoDB directly because Workers only supports HTTP requests, we need to follow this 
 [link](https://www.mongodb.com/developer/products/atlas/cloudflare-worker-rest-api/)
+
+### NeonDB
+
+Thanks to their native REST API, we can directly communicate with the database.
+It's used in this example to see how we can store data to create a stateful API.
+
