@@ -32,4 +32,3 @@ jobs:
 
     - name: Testing Code
       run: yarn test
-s
