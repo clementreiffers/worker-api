@@ -1,49 +1,22 @@
-import {type ArtistListType, type ArtistType} from './types';
+import {type ArtistType} from './types';
 import * as R from 'ramda';
-import {okResponse} from '../Response';
+import {internalError, okResponse} from '../Response';
 import {type UrlQueryType} from '../Response/types';
-import {type Client} from '@neondatabase/serverless';
 import {addArtistToNeon, getAllArtistsFromNeon} from '../Neon';
 import {type Env} from '../../types';
+import {type IRequest} from 'itty-router';
 
-const artistFactory = (artist: string): ArtistType => R.applySpec({
-	name: R.identity, musicList: undefined,
+const artistFactory = (artist: ArtistType): ArtistType => R.applySpec({
+	name: artist.name, musicList: artist?.musicList,
 })(artist) as ArtistType;
 
-const _computeAddArtist = (artistList: ArtistListType) =>
-	(artist: string): boolean => R.pipe(
-		artistFactory,
-		R.tap((artistCreated: ArtistType) => artistList.push(artistCreated)),
-		// PushArtistToMongo,
-		R.T,
-	)(artist);
-
-const _isArtistExist = (artistList: ArtistListType) =>
-	(artist: string): boolean =>
-		R.pipe(
-			(artistList: ArtistListType): ArtistListType => artistList, // Todo : Comprends pas pourquoi ts m'oblige ça
-			R.pluck('name'),
-			R.includes(artist),
-		)(artistList);
-
-const _computeAddArtistIfNoExists = (artistList: ArtistListType) =>
-	(artist: string): Response =>
-		R.ifElse(
-			_isArtistExist(artistList),
-			() => okResponse(String(false)),
-			R.pipe(_computeAddArtist(artistList), String, okResponse),
-		)(artist);
-
-/* Const addArtist = (artists: ArtistListType) =>
-	(req: UrlQueryType): Response => R.pipe(
-		decodeURIComponent,
-		_computeAddArtistIfNoExists(artists),
-	)(req.params.artist);
-*/
-
 const addArtist = (env: Env) =>
-	async (req: UrlQueryType): Promise<Response> =>
-		addArtistToNeon(env, req.params.artist).then(okResponse);
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return
+	async (request: IRequest): Promise<Response> => request.json()
+		.then((data: Record<string, unknown>) => data as ArtistType)
+		.then(addArtistToNeon(env))
+		.then(okResponse)
+		.catch(internalError);
 
 const _isArtistSearched = (artistSearched: string) =>
 	(artistName: string): boolean =>
