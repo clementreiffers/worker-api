@@ -49,15 +49,15 @@ const _isArtistSearched = (artistSearched: string) =>
 	(artistName: string): boolean =>
 		artistName.toLowerCase().includes(artistSearched.toLowerCase());
 
-const getArtist = (artistList: ArtistListType) =>
-	(req: UrlQueryType) => {
+const getArtist = (env: Env) =>
+	async (req: UrlQueryType): Promise<Response> => {
 		const artistSearched = decodeURIComponent(req.params.artist);
-		return R.pipe(
-			R.filter((artistStored: ArtistType) => _isArtistSearched(artistSearched)(artistStored.name)),
-			JSON.stringify,
-			R.tap(console.log),
-			okResponse,
-		)(artistList);
+		return getAllArtistsFromNeon(env)
+			.then(R.pipe(
+				R.filter((artistStored: ArtistType) => _isArtistSearched(artistSearched)(artistStored.name)),
+				JSON.stringify,
+				okResponse,
+			));
 	};
 
 const _formalizeArtistsResponse = R.pipe(

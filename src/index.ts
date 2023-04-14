@@ -21,7 +21,7 @@ const myAsyncFunction = async (): Promise<Response> => new Promise(resolve => {
 
 const createAndHandleRouter = async (request: Request, env: Env, ctx: ExecutionContext) => {
 	router.get('/helloworld', helloWorld);
-	router.get('/showArtist/:artist', getArtist(artists));
+	router.get('/getArtist/:artist', getArtist(env));
 	router.get('/addArtist/:artist', addArtist(env));
 	router.get('/getAllArtists', getAllArtists(env));
 	router.get('/myAsyncFunction', myAsyncFunction);
