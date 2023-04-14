@@ -16,7 +16,8 @@
   "scripts": {
     "start": "wrangler dev",
     "deploy": "wrangler publish",
-    "test": "vitest"
+    "devtest": "vitest",
+    "test": "vitest run"
   },
   "dependencies": {
     "@types/mongoose": "^5.11.97",
