@@ -3,16 +3,16 @@ import * as R from 'ramda';
 import {okResponse} from '../Response';
 import {type UrlQueryType} from '../Response/types';
 import {type Client} from '@neondatabase/serverless';
-import {getAllArtistsFromNeon} from '../Neon';
+import {addArtistToNeon, getAllArtistsFromNeon} from '../Neon';
 import {type Env} from '../../types';
 
-const _artistFactory = (artist: string): ArtistType => R.applySpec({
+const artistFactory = (artist: string): ArtistType => R.applySpec({
 	name: R.identity, musicList: undefined,
 })(artist) as ArtistType;
 
 const _computeAddArtist = (artistList: ArtistListType) =>
 	(artist: string): boolean => R.pipe(
-		_artistFactory,
+		artistFactory,
 		R.tap((artistCreated: ArtistType) => artistList.push(artistCreated)),
 		// PushArtistToMongo,
 		R.T,
@@ -34,11 +34,16 @@ const _computeAddArtistIfNoExists = (artistList: ArtistListType) =>
 			R.pipe(_computeAddArtist(artistList), String, okResponse),
 		)(artist);
 
-const addArtist = (artists: ArtistListType) =>
+/* Const addArtist = (artists: ArtistListType) =>
 	(req: UrlQueryType): Response => R.pipe(
 		decodeURIComponent,
 		_computeAddArtistIfNoExists(artists),
 	)(req.params.artist);
+*/
+
+const addArtist = (env: Env) =>
+	async (req: UrlQueryType): Promise<Response> =>
+		addArtistToNeon(env, req.params.artist).then(okResponse);
 
 const _isArtistSearched = (artistSearched: string) =>
 	(artistName: string): boolean =>
@@ -63,9 +68,6 @@ const _formalizeArtistsResponse = R.pipe(
 const getAllArtists = (env: Env) =>
 	async (): Promise<Response> =>
 		getAllArtistsFromNeon(env)
-			.then(R.tap(data => {
-				console.log('received:', data);
-			}))
 			.then(_formalizeArtistsResponse);
 
-export {addArtist, getArtist, getAllArtists};
+export {addArtist, getArtist, getAllArtists, artistFactory};
