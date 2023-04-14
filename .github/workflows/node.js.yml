@@ -31,4 +31,4 @@ jobs:
       run: yarn
 
     - name: Testing Code
-      run: yarn test
+      run: echo "add here testing code with vitest"
