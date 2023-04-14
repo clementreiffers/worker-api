@@ -20,8 +20,6 @@ const myAsyncFunction = async (): Promise<Response> => new Promise(resolve => {
 });
 
 const createAndHandleRouter = async (request: Request, env: Env, ctx: ExecutionContext) => {
-	// Const allArtists = await getAllArtistsFromNeon(client);
-
 	router.get('/helloworld', helloWorld);
 	router.get('/showArtist/:artist', getArtist(artists));
 	router.get('/addArtist/:artist', addArtist(artists));
