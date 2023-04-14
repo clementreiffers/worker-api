@@ -4,6 +4,7 @@ import {okResponse} from '../Response';
 import {type UrlQueryType} from '../Response/types';
 import {type Client} from '@neondatabase/serverless';
 import {getAllArtistsFromNeon} from '../Neon';
+import {type Env} from '../../types';
 
 const _artistFactory = (artist: string): ArtistType => R.applySpec({
 	name: R.identity, musicList: undefined,
@@ -54,10 +55,17 @@ const getArtist = (artistList: ArtistListType) =>
 		)(artistList);
 	};
 
-const getAllArtists = (artistList: ArtistListType) => (): Response => R.pipe(
+const _formalizeArtistsResponse = R.pipe(
 	R.pluck('name'),
 	JSON.stringify,
-	okResponse,
-)(artistList);
+	okResponse);
+
+const getAllArtists = (env: Env) =>
+	async (): Promise<Response> =>
+		getAllArtistsFromNeon(env)
+			.then(R.tap(data => {
+				console.log('received:', data);
+			}))
+			.then(_formalizeArtistsResponse);
 
 export {addArtist, getArtist, getAllArtists};
