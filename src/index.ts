@@ -9,11 +9,11 @@ const router = Router(); // No "new", as this is not a real class
 const helloWorld = (): Response => okResponse('helloworld');
 
 const createAndHandleRouter = async (request: Request, env: Env, ctx: ExecutionContext) => {
-	router.get('/helloworld', helloWorld);
-	router.get('/getArtist/:artist', getArtist(env));
-	router.post('/addArtist/', addArtist(env));
-	router.get('/getAllArtists', getAllArtists(env));
-	router.all('*', notFound);
+	router.get('/helloworld', helloWorld)
+		.get('/getArtist/:artist', getArtist(env))
+		.post('/addArtist/', addArtist(env))
+		.get('/getAllArtists', getAllArtists(env))
+		.all('*', notFound);
 
 	return router.handle(request, env, ctx);
 };
