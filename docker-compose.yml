@@ -1,8 +1,6 @@
 version: '3.9'
-
 services:
-  worker:
+  artist-worker:
     build: .
     ports:
-      - '8787:8080'
-    container_name: 'artist-worker'
+      - '8080:8080'
