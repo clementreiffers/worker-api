@@ -1,5 +1,5 @@
 wrangler-build:
-	npm wrangler publish --dry-run --outdir=./build
+	npx wrangler publish --dry-run --outdir ./build --minify true
 
 build-run-release: clean wrangler-build
 	yarn workerd serve my-config.capnp
