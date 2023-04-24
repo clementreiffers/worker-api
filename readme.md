@@ -15,7 +15,8 @@ it serves to see all the limits and possibilities.
    1. [The API](#the-api)
    2. [MongoDB](#mongodb)
    3. [NeonDB](#neondb)
-   4. 
+   4. [Turso](#turso)
+
 ## Try on your machine
 
 ### Install it
