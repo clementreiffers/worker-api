@@ -1,0 +1,1 @@
+This folder contains the built output assets for the worker "hello" generated at 2023-04-24T07:44:07.727Z.
