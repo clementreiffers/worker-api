@@ -17,7 +17,7 @@ const config :Workerd.Config = (
 
 const mainWorker :Workerd.Worker = (
     modules = [
-      (name = "worker", esModule = embed "./build/index.js")
+      (name = "worker", esModule = embed "index.js")
     ],
   compatibilityDate = "2023-02-28",
   # Learn more about compatibility dates at:

@@ -20,5 +20,7 @@ COPY --from=builder my-config.capnp ./
 
 RUN npm install -g workerd
 
+EXPOSE 8080
+
 ENTRYPOINT ["workerd"]
 CMD ["serve", "my-config.capnp"]

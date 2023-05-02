@@ -19,12 +19,12 @@ build-run-docker: build-docker
 clean:
 	rm -fr ./build ./dist
 
-delete-kubernetes-ressources: build-push-docker
+delete-kubernetes-ressources:
 	kubectl delete deployments artist-worker
 	kubectl delete services artist-worker
 	kubectl delete ingress artist-worker
 
-deploy-kubernetes-ressources:
+deploy-kubernetes-ressources: build-push-docker
 	kubectl apply -f ./kubernetes/deployment.yaml
 	kubectl apply -f ./kubernetes/service.yaml
 	kubectl apply -f ./kubernetes/ingress.yaml
