@@ -1,20 +1,26 @@
 config:
-  target: "localhost:80"
+  target: "http://localhost"
   phases:
     - duration: 60
-      arrivalRate: 5
-      name: Warm up
-    - duration: 120
-      arrivalRate: 5
-      rampTo: 50
-      name: Ramp up load
-    - duration: 600
-      arrivalRate: 50
-      name: Sustained load
-
+      arrivalRate: 10
+  metrics:
+    - name: "latency"
+      type: "percentiles"
+      percentiles:
+        - 50
+        - 95
+        - 99
+    - name: "http_errors"
+      type: "count"
+      count:
+        400: 0.5
+        500: 1
 scenarios:
-  - name: "LinearRegression"
+  - name: "linear-regression test"
     flow:
       - get:
           url: "/linear-regression"
-      - think: 5
+          headers:
+            User-Agent: "Artillery"
+          expect:
+            statusCode: 200
