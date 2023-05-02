@@ -25,6 +25,6 @@ delete-kubernetes-ressources: build-push-docker
 	kubectl delete ingress artist-worker
 
 deploy-kubernetes-ressources:
-	kubectl apply -f ./kubernetes/artist-worker-deployment.yaml
-	kubectl apply -f ./kubernetes/artist-worker-service.yaml
-	kubectl apply -f ./kubernetes/artist-worker-ingress.yaml
+	kubectl apply -f ./kubernetes/deployment.yaml
+	kubectl apply -f ./kubernetes/service.yaml
+	kubectl apply -f ./kubernetes/ingress.yaml
