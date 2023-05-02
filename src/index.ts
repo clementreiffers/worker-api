@@ -21,14 +21,15 @@ const computeLinearRegression = (): Response => {
 };
 
 const createAndHandleRouter = async (request: Request, env: Env, ctx: any) => {
-	router.get('/helloworld', helloWorld)
+	const handle = router.get('/helloworld', helloWorld)
 		.get('/getArtist/:artist', getArtist(env))
 		.post('/addArtist/', addArtist(env))
 		.get('/getAllArtists', getAllArtists(env))
 		.get('/linear-regression', computeLinearRegression)
-		.all('*', notFound);
-
-	return router.handle(request, env, ctx);
+		.all('*', notFound)
+		.handle(request, env, ctx);
+	console.log('listening...');
+	return handle;
 };
 
 export default {fetch: createAndHandleRouter};
