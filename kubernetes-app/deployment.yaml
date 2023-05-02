@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: artist-worker
+spec:
+  selector:
+    matchLabels:
+      app: artist-worker
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: artist-worker
+    spec:
+      containers:
+        - name: artist-worker
+          image: clementreiffers/artist-worker
+          ports:
+            - containerPort: 3000
+              hostPort: 3000

@@ -1,0 +1,17 @@
+# deployment/kubernetes-app-prom-svc.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: artist-worker
+  name: artist-worker
+spec:
+  ports:
+    - name: artist-worker
+      port: 3000
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app: artist-worker
+  type: LoadBalancer
