@@ -9,7 +9,7 @@ COPY ./ ./
 
 RUN wrangler publish --dry-run --outdir=./build
 
-FROM clementreiffers/workerd AS worker
+FROM ghcr.io/clementreiffers/workerd AS worker
 
 RUN mkdir ./build ./worker2
 

@@ -1,4 +1,4 @@
-IMAGE_NAME=clementreiffers/artist-worker
+IMAGE_NAME=ghcr.io/clementreiffers/worker-api:latest
 
 wrangler-build:
 	npx wrangler publish --dry-run --outdir ./build --minify true
@@ -24,7 +24,7 @@ delete-kubernetes-ressources:
 	kubectl delete services artist-worker
 	kubectl delete ingress artist-worker
 
-deploy-kubernetes-ressources:  build-push-docker
+deploy-kubernetes-ressources: delete-kubernetes-ressources build-push-docker
 	kubectl apply -f ./kubernetes/artist-worker/deployment.yaml
 	kubectl apply -f ./kubernetes/artist-worker/service.yaml
 	kubectl apply -f ./kubernetes/artist-worker/ingress.yaml

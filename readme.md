@@ -11,6 +11,7 @@ it serves to see all the limits and possibilities.
 2. [Try inside a docker image](#try-inside-a-docker-image)
    1. [Build it](#build-the-docker-image)
    2. [Run it](#run-the-docker-image)
+   3. [Push the docker image to GitHub](#push-the-docker-image-to-github)
 3. [Kubernetes](#kubernetes)
 4. [Explanation](#explanation)
    1. [The API](#the-api)
@@ -49,6 +50,11 @@ of [The API](#the-api) !
 
 you can also use the Makefile by running `make build-run-docker`, it will always build the image
 before running it.
+
+### Push the docker image to GitHub
+
+follow this [link from dev.to](https://dev.to/github/publishing-a-docker-image-to-githubs-container-repository-4n50)
+or this [link from official GitHub documentation](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
 
 ## Kubernetes
 
