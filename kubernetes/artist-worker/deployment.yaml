@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: artist-worker
+  name: workerd
 spec:
   selector:
     matchLabels:
-      app: artist-worker
+      app: workerd
   replicas: 1
   template:
     metadata:
       labels:
-        app: artist-worker
+        app: workerd
     spec:
       containers:
         - name: artist-worker
