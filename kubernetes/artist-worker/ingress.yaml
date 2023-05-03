@@ -8,10 +8,17 @@ spec:
   rules:
   - http:
       paths:
-        - path: /
+        - path: /artist
           pathType: Prefix
           backend:
             service:
               name: artist-worker
               port:
                 number: 8080
+        - path: /hello-world
+          pathType: Prefix
+          backend:
+            service:
+              name: hello-world-worker
+              port:
+                number: 8081

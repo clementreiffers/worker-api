@@ -13,7 +13,7 @@ spec:
         app: workerd
     spec:
       containers:
-        - name: artist-worker
+        - name: workerd
           image: clementreiffers/artist-worker
           ports:
             - containerPort: 8080
