@@ -20,15 +20,13 @@ const computeLinearRegression = (): Response => {
 	return okResponse(String(predict(10, lin)));
 };
 
-const createAndHandleRouter = async (request: Request, env: Env, ctx: any) => {
+const createAndHandleRouter = async (request: Request, env: Env, ctx: any) =>
 	router.get('/helloworld', helloWorld)
 		.get('/getArtist/:artist', getArtist(env))
 		.post('/addArtist/', addArtist(env))
 		.get('/getAllArtists', getAllArtists(env))
 		.get('/linear-regression', computeLinearRegression)
-		.all('*', notFound);
-
-	return router.handle(request, env, ctx);
-};
+		.all('*', notFound)
+		.handle(request, env, ctx);
 
 export default {fetch: createAndHandleRouter};

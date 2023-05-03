@@ -5,5 +5,4 @@ node_modules
 .eslintrc.json
 docker-compose.yml
 package-lock.json
-wrangler.toml
 yarn-error.log

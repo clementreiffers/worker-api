@@ -1,0 +1,26 @@
+config:
+  target: "http://localhost"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+  metrics:
+    - name: "latency"
+      type: "percentiles"
+      percentiles:
+        - 50
+        - 95
+        - 99
+    - name: "http_errors"
+      type: "count"
+      count:
+        400: 0.5
+        500: 1
+scenarios:
+  - name: "linear-regression test"
+    flow:
+      - get:
+          url: "/linear-regression"
+          headers:
+            User-Agent: "Artillery"
+          expect:
+            statusCode: 200
