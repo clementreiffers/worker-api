@@ -20,6 +20,7 @@ it serves to see all the limits and possibilities.
       2. [NeonDB](#neondb)
       3. [Turso](#turso)
    3. [Configure it yourself](#configure-it-yourself)
+5. [Cloud Architecture]
 
 ## Try on your machine
 
@@ -108,3 +109,35 @@ if you want to test it with a bigger configuration, let's see this
 > By default, there is a limitation of 128 Mo per workers
 > with the worker example `src/index.ts` you can run only approximately 700 workers
 > at the same time instead of 3000 with the worker `worker2/index.js` 
+
+## Cloud architecture
+
+in order to optimize all the process, we can think of a context like that :
+
+```mermaid
+flowchart TB
+    db[(database)] --> workerd-1 --> db
+    
+    admin --> |Set JavaScript / Wasm files using SSH| Volume
+    subgraph Kubernetes-Cluster 
+        subgraph workerd-1
+            worker1
+            worker2
+            worker3
+            worker...
+        end
+        Volume --> |JS / WASM files| workerd-1
+        Volume --> |trigger| w1
+        subgraph workerd-2
+            w1[capnp-generator] --> w2[workerd1-controller]
+        end
+        w2 --> |save Capnp config generated| Volume
+        w2 --> |restart with a new Capnp file| workerd-1
+    end
+    
+    client <--> |HTTP| worker1 & worker2 & worker3 & worker...
+    
+```
+
+this schema could evolve because of workers that can use only HTTP requests.
+To save the capnp file, we will maybe save it into a database fetch-able using HTTP only.
