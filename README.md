@@ -20,7 +20,7 @@ it serves to see all the limits and possibilities.
       2. [NeonDB](#neondb)
       3. [Turso](#turso)
    3. [Configure it yourself](#configure-it-yourself)
-5. [Cloud Architecture]
+5. [Cloud Architecture](#cloud-architecture)
 
 ## Try on your machine
 
