@@ -4,7 +4,7 @@ wrangler-build:
 	npx wrangler publish --dry-run --outdir ./build --minify true
 
 build-run-release: clean wrangler-build
-	yarn workerd serve my-config.capnp
+	  npx workerd serve my-config.capnp
 
 build-docker:
 	colima start
@@ -24,7 +24,7 @@ delete-kubernetes-ressources:
 	kubectl delete services artist-worker
 	kubectl delete ingress artist-worker
 
-deploy-kubernetes-ressources: delete-kubernetes-ressources build-push-docker
+deploy-kubernetes-ressources:
 	kubectl apply -f ./kubernetes/artist-worker/deployment.yaml
 	kubectl apply -f ./kubernetes/artist-worker/service.yaml
 	kubectl apply -f ./kubernetes/artist-worker/ingress.yaml

@@ -15,7 +15,7 @@ RUN mkdir ./build ./worker2
 
 COPY --from=builder ./build ./build
 COPY ./worker2 ./worker2
-COPY my-config.capnp ./
+COPY old-config.capnp ./
 
 
 EXPOSE 8080 8081

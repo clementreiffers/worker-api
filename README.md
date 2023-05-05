@@ -19,6 +19,7 @@ it serves to see all the limits and possibilities.
       1. [MongoDB](#mongodb)
       2. [NeonDB](#neondb)
       3. [Turso](#turso)
+   3. [Configure it yourself](#configure-it-yourself)
 
 ## Try on your machine
 
@@ -94,3 +95,16 @@ It's used in this example to see how we can store data to create a stateful API.
 
 Turso is the most powerful database I will use in this kind of project.
 see here for more information : [Turso](https://chiselstrike.com/)
+
+### Configure It Yourself
+
+There is a [cap'n'proto](https://capnproto.org) file to configure all workers and sockets.
+
+in this example, it runs 2 workers in the same runtime, and it works using only 10 Mo memory!
+if you want to test it with a bigger configuration, let's see this 
+[GitHub Repo](https://github.com/clementreiffers/capnp-generator).
+
+> **Note**
+> By default, there is a limitation of 128 Mo per workers
+> with the worker example `src/index.ts` you can run only approximately 700 workers
+> at the same time instead of 3000 with the worker `worker2/index.js` 
