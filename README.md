@@ -21,6 +21,7 @@ it serves to see all the limits and possibilities.
       3. [Turso](#turso)
    3. [Configure it yourself](#configure-it-yourself)
 5. [Cloud Architecture](#cloud-architecture)
+6. [Links](#links)
 
 ## Try on your machine
 
@@ -141,3 +142,14 @@ flowchart TB
 
 this schema could evolve because of workers that can use only HTTP requests.
 To save the capnp file, we will maybe save it into a database fetch-able using HTTP only.
+
+
+## Links
+
+
+- [Cloudflare Worker](https://workers.cloudflare.com)
+- [Workerd NPM Package](https://www.npmjs.com/package/workerd)
+- [TypeScript Lang](https://www.typescriptlang.org)
+- [How to build Rust to WebAssembly for Workerd](https://developer.mozilla.org/en-US/docs/WebAssembly/Rust_to_wasm)
+- [Memory limits](https://community.cloudflare.com/t/workers-memory-limit/491329/2)
+- [HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/)
