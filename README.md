@@ -113,6 +113,8 @@ if you want to test it with a bigger configuration, let's see this
 
 ## Cloud architecture
 
+### arch v1
+
 in order to optimize all the process, we can think of a context like that :
 
 ```mermaid
@@ -142,6 +144,86 @@ flowchart TB
 
 this schema could evolve because of workers that can use only HTTP requests.
 To save the capnp file, we will maybe save it into a database fetch-able using HTTP only.
+
+problems :
+- **how to restart workerd-1 with args?**
+
+### arch v2
+
+```mermaid
+flowchart LR
+    admin --> |ssh: JS/Wasm/Capnp| Volume
+    subgraph Kubernetes-Cluster
+        Volume --> |trigger| Killer-Restarter-Pod --> Linux-Depl
+
+        HPA --> |instantiate in another node| Linux-Depl
+
+        subgraph Linux-Depl
+           subgraph Linux-1
+              manager-1 --> |restart docker| workerd-1
+           end
+           subgraph Linux-2
+              manager-2 --> |restart docker| workerd-2 
+           end
+        end
+        workerd-1 & workerd-2 --> |Get Files| Volume
+    end
+```
+
+> **Note :**
+> - we don't need any arguments while restarting the Linux-Depl
+
+> **Warning :**
+> - how to kill / restart pods ?
+> - Less Scalable than Arch V1 due to multiple managers
+> - Consume more resources than V1
+
+but here we don't need any arguments while restarting the Linux-Depl
+
+
+### arch v3
+
+```mermaid
+flowchart LR
+    admin --> |ssh| Volume
+    admin --> |triggered| Volume
+    subgraph Kubernetes-Cluster
+        HPA --> worker-deployment
+      subgraph worker-deployment
+         subgraph workerd-1 
+             direction LR
+             worker1-1
+             worker2-1
+         end
+         subgraph workerd-2
+             direction LR
+             worker1-2
+             worker2-2
+         end
+      end
+   
+      subgraph Volume
+          direction LR
+          config.capnp
+          restarter
+          files
+          capnp-generator
+      end
+      worker-deployment --> |get Files| Volume
+      Volume --> |restart| worker-deployment
+   end
+```
+> **Note :**
+> - all workerd inside the worker-deployment will reed the `config.capnp` file
+> - there is no args because the config has to be `config.capnp` file
+> - The `config.capnp` can be build manually or dynamically
+> - the admin restart the worker-deployment manually => can be automatized by himself if ssh done
+> - More scalable than V2
+> - Less resources than V1 (No Managers & File watcher)
+
+> **Warning :**
+> - needs a CI/CD => we have to build&test all projects, generate a capnp file and then send it using SSH
+
 
 
 ## Links
