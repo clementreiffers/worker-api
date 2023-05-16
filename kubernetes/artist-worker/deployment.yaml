@@ -98,8 +98,7 @@ metadata:
     app: artist-worker
 spec:
   rules:
-    - host: ba113b6b-0746-4372-b61c-8c8897262f13.pub.instances.scw.cloud
-      http:
+    - http:
         paths:
           - path: /artist
             pathType: Prefix
