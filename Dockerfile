@@ -9,16 +9,29 @@ COPY ./ ./
 
 RUN wrangler publish --dry-run --outdir=./build
 
-FROM ghcr.io/clementreiffers/workerd AS worker
+FROM ubuntu AS worker-builder
+ADD https://github.com/cloudflare/workerd/releases/download/v1.20230419.0/workerd-linux-64.gz ./
+
+RUN apt-get update && apt-get install -y clang libc++-dev
+
+RUN gunzip workerd-linux-64.gz
+
+RUN mv workerd-linux-64 usr/local/bin/workerd
+
+RUN chmod +x usr/local/bin/workerd
 
 RUN mkdir ./build ./worker2
 
 COPY --from=builder ./build ./build
 COPY ./worker2 ./worker2
-COPY my-config.capnp ./
+COPY ./ ./
+RUN workerd compile my-config.capnp > serv.out
 
+# why do we use ubuntu in prod : https://github.com/cloudflare/workerd/issues/286
+FROM ubuntu AS worker
 
-EXPOSE 8080 8081
+RUN apt-get update && apt-get install -y libc++-dev
 
-ENTRYPOINT ["workerd"]
-CMD ["serve", "my-config.capnp"]
+COPY --from=worker-builder serv.out .
+
+CMD ["./serv.out"]

@@ -1,7 +1,10 @@
-FROM ubuntu AS worker
+FROM ubuntu AS worker-builder
+ADD https://github.com/cloudflare/workerd/releases/download/v1.20230419.0/workerd-linux-64.gz ./
 
-RUN apt-get update && apt-get install -y clang libc++-dev libc++abi-dev nodejs npm
+RUN apt-get update && apt-get install -y clang libc++-dev
 
-RUN npm install -g workerd
+RUN gunzip workerd-linux-64.gz
 
-# then you can use workerd to serve your capnp config
+RUN mv workerd-linux-64 usr/local/bin/workerd
+
+RUN chmod +x usr/local/bin/workerd
