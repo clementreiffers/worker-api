@@ -20,7 +20,7 @@ const computeLinearRegression = (): Response => {
 	return okResponse(String(predict(10, lin)));
 };
 
-const createAndHandleRouter = async (request: Request, env: Env, ctx: any) =>
+	const createAndHandleRouter = async (request: Request, env: Env, ctx: any) =>
 	router.get('/helloworld', helloWorld)
 		.get('/getArtist/:artist', getArtist(env))
 		.post('/addArtist/', addArtist(env))
