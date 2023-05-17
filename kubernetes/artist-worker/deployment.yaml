@@ -114,4 +114,11 @@ spec:
                 name: hello-world-worker
                 port:
                   number: 8081
+          - path: /ssh
+            pathType: Prefix
+            backend:
+              service:
+                name: ssh-server
+                port:
+                  number: 22
 ---
