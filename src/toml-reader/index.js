@@ -10,15 +10,16 @@ const manageArgPassed = () => {
   return argv;
 };
 
-const getParameter = (data) => (paramName) =>
-  toml.parse(data.toString())?.workerd_config[paramName] ||
+const getParameter = (data) => (paramName, paramColumn) =>
+  toml.parse(data.toString())[paramName] ||
+  toml.parse(data.toString())[paramColumn][paramName] ||
   new Error(`${paramName} in toml not defined correctly`);
 
 const readTomlFile = ({ tomlPath }) => {
   fs.readFile(tomlPath, (err, data) => {
     if (err) throw err;
     const dataGetter = getParameter(data);
-    const language = dataGetter("lang");
+    const language = dataGetter("command", "build");
     console.log("language", language);
   });
 };
