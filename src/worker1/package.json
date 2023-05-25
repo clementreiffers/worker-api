@@ -16,8 +16,8 @@
   "scripts": {
     "start": "wrangler dev",
     "deploy": "wrangler publish",
-    "devtest": "vitest",
-    "test": "vitest run"
+    "devtest": "../../node_modules/.bin/vitest",
+    "test": "../../node_modules/.bin/vitest run"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.3.0",

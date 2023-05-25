@@ -1,16 +1,9 @@
 name = "example"
-type = "languageExample"
+type = "javascript"
 compatibility_date = "2023-04-11"
-main = "src/index.js"
+main = "build/index.js"
 
 [build]
 command = "cargo install -q worker-build && worker-build --release" # required
-
-[build.upload]
-dir = "build/worker"
-format = "modules"
-main = "./shim.mjs"
-
-[[build.upload.rules]]
-globs = ["**/*.wasm"]
-type = "CompiledWasm"
+image_builder = ""
+dir = "build"

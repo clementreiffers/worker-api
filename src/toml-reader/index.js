@@ -10,17 +10,12 @@ const manageArgPassed = () => {
   return argv;
 };
 
-const getParameter = (data) => (paramName, paramColumn) =>
-  toml.parse(data.toString())[paramName] ||
-  toml.parse(data.toString())[paramColumn][paramName] ||
-  new Error(`${paramName} in toml not defined correctly`);
-
 const readTomlFile = ({ tomlPath }) => {
   fs.readFile(tomlPath, (err, data) => {
     if (err) throw err;
-    const dataGetter = getParameter(data);
-    const language = dataGetter("command", "build");
-    console.log("language", language);
+    const dataParsed = toml.parse(data.toString());
+    const { name, type, compatibility_date, main, build } = dataParsed;
+    console.log("language", build);
   });
 };
 

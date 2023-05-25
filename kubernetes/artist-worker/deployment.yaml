@@ -98,7 +98,8 @@ metadata:
     app: artist-worker
 spec:
   rules:
-    - http:
+    - host: worker.51-159-115-150.sslip.io
+      http:
         paths:
           - path: /artist
             pathType: Prefix
@@ -114,11 +115,4 @@ spec:
                 name: hello-world-worker
                 port:
                   number: 8081
-          - path: /ssh
-            pathType: Prefix
-            backend:
-              service:
-                name: ssh-server
-                port:
-                  number: 22
 ---

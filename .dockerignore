@@ -4,5 +4,5 @@ node_modules
 .eslintignore
 .eslintrc.json
 docker-compose.yml
-package-lock.json
+src/worker1/package-lock.json
 yarn-error.log

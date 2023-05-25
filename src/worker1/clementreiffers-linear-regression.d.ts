@@ -1,1 +1,1 @@
-declare module 'clementreiffers-linear-regression';
+declare module 'worker1/clementreiffers-linear-regression';

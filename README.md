@@ -67,7 +67,11 @@ You'll see how to create the cluster with kind with all ports to open and how to
 You can find the kubernetes files in the `kubernetes` folder.
 you can run the command `make build-push-docker` to apply all of them.
 
-if you want to delete all ressources in your cluster, run `make delete-kubernetes-ressources`
+if you want to delete all resources in your cluster, run `make delete-kubernetes-ressources`
+
+### Scaleway
+
+if you push to scaleway, deploy the ingress controller given by them and configure it as a LoadBalancer.
 
 
 ## Explanation
@@ -109,7 +113,7 @@ if you want to test it with a bigger configuration, let's see this
 > **Note**
 > By default, there is a limitation of 128 Mo per workers
 > with the worker example `src/index.ts` you can run only approximately 700 workers
-> at the same time instead of 3000 with the worker `worker2/index.js` 
+> at the same time instead of 3000 with the worker `worker2/index.ts` 
 
 ## Cloud architecture
 
@@ -225,6 +229,27 @@ flowchart LR
 > - needs a CI/CD => we have to build&test all projects, generate a capnp file and then send it using SSH
 
 
+1st step : send the tar file
+2nd step : give the route api, S3 token api, url S3
+
+### arch v4
+
+```mermaid
+flowchart TB
+   admin --> Git -->|webhook| controller & CRD
+   Git --> |clone| builder
+   builder --> |push| registry --> |pull| workerPod
+    subgraph Kubernetes
+        builder(job pod: download + build + push) --> controller
+        CRD --> controller
+        controller --> deployment
+        deployment --> workerPod --> |GET| secrets
+    end
+    client --> |HTTPS| workerPod
+
+```
+pour les secrets, voir openssl ou gpg pour chiffrer l'executable
+gpg asymétrique donc mieux
 
 ## Links
 
