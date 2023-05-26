@@ -1,8 +1,15 @@
-ARG build-command
+ARG BUILD_COMMAND
+ARG IMAGE=alpine
 
-FROM python
+FROM $IMAGE AS builder
+ARG BUILD_COMMAND
 
-RUN pip install tomlq
+RUN if [ -z $BUILD_COMMAND -z $IMAGE ]; then \
+      echo "you need to specify either IMAGE or BUILD_COMMAND arg" ; \
+      exit 1 ; \
+    else \
+      $BUILD_COMMAND ; \
+    fi
 
-COPY example.toml ./
+RUN echo $BUILD_COMMAND > truc
 
