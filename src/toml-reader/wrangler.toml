@@ -5,5 +5,5 @@ main = "build/index.js"
 
 [build]
 command = "echo hello world" # required
-image = "testImage"
+#image = "testImage"
 #dir = "./build"

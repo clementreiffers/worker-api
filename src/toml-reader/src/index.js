@@ -3,17 +3,18 @@ import {readFile} from 'fs';
 import {hideBin} from 'yargs/helpers';
 import yargs from 'yargs';
 
-const readTomlFile = ({tomlPath, valuePath}) => {
+const readTomlFile = ({tomlPath, valuePath, defaultValue}) => {
 	readFile(tomlPath, (err, data) => {
 		if (err) {
 			throw err;
 		}
 
-		if (!tomlPath || !valuePath) {
-			throw new Error('missing --tomlPath or --valuePath');
+		if (!tomlPath || !valuePath || !defaultValue) {
+			throw new Error('missing --tomlPath or --valuePath or --defaultValue');
 		}
 
-		console.log(valuePath.split('.').reduce((obj, key) => obj[key], toml.parse(data.toString())));
+		const value = valuePath.split('.').reduce((obj, key) => obj[key], toml.parse(data.toString()));
+		console.log(value || defaultValue);
 	});
 };
 
