@@ -1,19 +1,16 @@
 {
   "dependencies": {
     "fs": "^0.0.1-security",
-    "toml": "^3.0.0",
-    "yargs": "^17.7.2"
+    "toml": "^3.0.0"
   },
   "name": "toml-reader",
+  "type": "module",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",
   "license": "MIT",
-  "devDependencies": {
-    "nodemon": "^2.0.22",
-    "prettier": "^2.8.8"
-  },
+  "devDependencies": {},
   "scripts": {
-    "start": "node index.js --tomlPath example.toml"
+    "start": "node src/index.js",
+    "dev": "npx nodemon src/index.js"
   }
 }
