@@ -1,5 +1,7 @@
 import * as toml from 'toml';
 import {readFile} from 'fs';
+import {hideBin} from 'yargs/helpers';
+import yargs from 'yargs';
 
 const readTomlFile = ({tomlPath, valuePath}) => {
 	readFile(tomlPath, (err, data) => {
@@ -7,14 +9,16 @@ const readTomlFile = ({tomlPath, valuePath}) => {
 			throw err;
 		}
 
-		const dataParsed = toml.parse(data.toString());
-		const resultat = valuePath.split('.').reduce((obj, key) => obj[key], dataParsed);
-		console.log(resultat);
+		if (!tomlPath || !valuePath) {
+			throw new Error('missing --tomlPath or --valuePath');
+		}
+
+		console.log(valuePath.split('.').reduce((obj, key) => obj[key], toml.parse(data.toString())));
 	});
 };
 
 const main = () => {
-	readTomlFile({tomlPath: 'wrangler.toml', valuePath: 'build.container'});
+	readTomlFile(yargs(hideBin(process.argv)).argv);
 };
 
 main();
