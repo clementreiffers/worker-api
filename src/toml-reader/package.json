@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "fs": "^0.0.1-security",
-    "toml": "^3.0.0"
+    "toml": "^3.0.0",
+    "yargs": "^17.7.2"
   },
   "name": "toml-reader",
   "type": "module",
