@@ -9,7 +9,7 @@ const readTomlFile = ({tomlPath, valuePath, defaultValue}) => {
 			throw err;
 		}
 
-		if (!tomlPath || !valuePath || !defaultValue) {
+		if (tomlPath ?? valuePath ?? defaultValue === undefined) {
 			throw new Error('missing --tomlPath or --valuePath or --defaultValue');
 		}
 

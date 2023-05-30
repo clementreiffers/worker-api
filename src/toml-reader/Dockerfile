@@ -1,4 +1,6 @@
 ARG GIT
+ARG IMAGE=alpine
+ARG BUILD_COMMAND
 
 FROM alpine AS downloader
 ARG GIT
@@ -13,21 +15,13 @@ RUN if [ -z $GIT ]; then \
 
 FROM node AS arg-setter
 
-ARG BUILD_COMMAND
-ARG IMAGE
-
 COPY ./ ./
 COPY --from=downloader source/wrangler.toml ./
 
 RUN yarn
 
-RUN IMAGE=$(node src/index.js --tomlPath wrangler.toml --valuePath build.image)
-RUN BUILD_COMMAND=$(node src --tomlPath wrangler.toml --valuePath build.command)
-
-RUN echo $img $build_cmd > truc
-
-# ARG IMAGE=img
-ARG BUILD_COMMAND=$build_cmd
+RUN node src/index.js --tomlPath wrangler.toml --valuePath build.image --defaultValue alpine > image
+RUN node src --tomlPath wrangler.toml --valuePath build.command --defaultValue 'echo ""' > build_command
 
 FROM $IMAGE AS builder
 ARG BUILD_COMMAND
