@@ -34,7 +34,7 @@ then you have to put a secret to wrangler to be able to communicate with the DB 
 
 ### Run it
 
-run `npm install -g wrangler` then `npx wranger dev src/index.ts`
+run `npm install -g wrangler` then `npx wranger dev src/index.js`
 
 ## Try inside a docker image
 
@@ -112,8 +112,8 @@ if you want to test it with a bigger configuration, let's see this
 
 > **Note**
 > By default, there is a limitation of 128 Mo per workers
-> with the worker example `src/index.ts` you can run only approximately 700 workers
-> at the same time instead of 3000 with the worker `worker2/index.ts` 
+> with the worker example `src/index.js` you can run only approximately 700 workers
+> at the same time instead of 3000 with the worker `worker2/index.js` 
 
 ## Cloud architecture
 

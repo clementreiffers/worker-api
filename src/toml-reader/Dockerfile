@@ -1,6 +1,4 @@
 ARG GIT
-ARG IMAGE=alpine
-ARG BUILD_COMMAND
 
 FROM alpine AS downloader
 ARG GIT
@@ -13,26 +11,24 @@ RUN if [ -z $GIT ]; then \
       git clone $GIT source ; \
     fi
 
-FROM node AS arg-setter
+FROM node AS builder
 
-COPY ./ ./
-COPY --from=downloader source/wrangler.toml ./
+COPY ./ usr/local/bin/gettoml
+COPY --from=downloader source ./source
 
-RUN yarn
+RUN cd /usr/local/bin/gettoml &&  yarn
 
-RUN node src/index.js --tomlPath wrangler.toml --valuePath build.image --defaultValue alpine > image
-RUN node src --tomlPath wrangler.toml --valuePath build.command --defaultValue 'echo ""' > build_command
+RUN build_command=$(gettoml --tomlPath wrangler.toml --valuePath build.command --defaultValue 'echo ""')
 
-FROM $IMAGE AS builder
-ARG BUILD_COMMAND
-
-COPY --from=downloader ./source ./
-
-RUN if [ -z $BUILD_COMMAND -z $IMAGE ]; then \
-      echo "you need to specify either IMAGE or BUILD_COMMAND arg" ; \
+RUN if [ -z $build_command ]; then \
+      echo "you need to specify build command in toml" ; \
       exit 1 ; \
     else \
       $BUILD_COMMAND ; \
     fi
 
-RUN echo $BUILD_COMMAND > truc
+FROM node AS capnp-creator
+
+RUN git clone https://github.com/clementreiffers/capnp-generator
+
+# let's reimplement capnp-generator

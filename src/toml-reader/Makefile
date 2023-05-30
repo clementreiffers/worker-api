@@ -6,3 +6,8 @@ create-builder:
 
 run-builder: create-builder
 	docker run -it test sh
+
+clean:
+	docker image prune
+	docker volume prune
+	docker container prune
