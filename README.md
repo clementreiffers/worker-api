@@ -251,6 +251,45 @@ flowchart TB
 pour les secrets, voir openssl ou gpg pour chiffrer l'executable
 gpg asymétrique donc mieux
 
+### arch v5
+
+```mermaid
+flowchart TB
+    subgraph gits
+        direction TB
+       git1 & git2 & git3
+    end
+     gits --> |webhook| controller
+    subgraph Kubernetes
+       subgraph volumes
+          source-volume & builds-volume & executable
+       end
+       controller --> |start| builders
+        subgraph download-build-push
+            builders --> |mount & clone git| source-volume
+           subgraph builders
+               direction TB
+               builder("clone & build with command given by all wrangler.toml") --> capnp-workerd-generator
+           end
+           builders --> |list workerd capnp| capnp-service-generator
+           capnp-service-generator --> |final capnp|workerd-builder
+           capnp-service-generator --> |push final capnp| builds-volume
+           builders --> |mount| source-volume
+           builders --> |mount & push builds| builds-volume
+           workerd-builder --> |mount| builds-volume
+           workerd-builder --> |mount & push exec| executable
+        end
+        workerd-builder --> |trigger| workerdController
+        workerdController --> |restart| workerdPod
+        workerdPod --> |mount| executable
+        workerdPod --> |get| secrets
+        subgraph workerd-deployment
+            workerdPod
+        end
+    end
+    client --> |https| workerd-deployment
+```
+
 ## Links
 
 
