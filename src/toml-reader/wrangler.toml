@@ -1,9 +1,0 @@
-name = "example"
-type = "javascript"
-compatibility_date = "2023-04-11"
-main = "build/index.js"
-
-[build]
-command = "echo hello world" # required
-#image = "testImage"
-#dir = "./build"

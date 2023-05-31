@@ -2,6 +2,7 @@ create-builder:
 	docker build \
 		--build-arg GIT='https://github.com/clementreiffers/rust-workers.git' \
 		-t test \
+		-f prebuild.Dockerfile \
 		. --no-cache
 
 run-builder: create-builder

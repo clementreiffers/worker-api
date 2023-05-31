@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  prebuild:
+    build:
+      context: .
+      target: prebuild
+      dockerfile: prebuild.Dockerfile
+      args:
+        - GIT=https://github.com/clementreiffers/rust-workers.git
+    volumes:
+      - ./source:/source
+      - ./commands:/commands
+    image: test:latest
+
+volumes:
+  source:
+  build:
+  commands:

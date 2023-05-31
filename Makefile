@@ -14,7 +14,7 @@ build-run-serv: build-serv
 	./serv.out
 
 build-workerd-docker:
-	#docker build -t $(WORKERD) -f workerd.Dockerfile . --no-cache
+	#docker build -t $(WORKERD) -f workerd.prebuild.Dockerfile . --no-cache
 
 build-docker:
 	docker build --tag=$(IMAGE_NAME) .  --no-cache
