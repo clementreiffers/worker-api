@@ -4,16 +4,10 @@ services:
   prebuild:
     build:
       context: .
-      target: prebuild
       dockerfile: prebuild.Dockerfile
-      args:
-        - GIT=https://github.com/clementreiffers/rust-workers.git
-    volumes:
-      - ./source:/source
-      - ./commands:/commands
-    image: test:latest
-
-volumes:
-  source:
-  build:
-  commands:
+    image: prebuild:latest
+    environment:
+      GIT: https://github.com/clementreiffers/rust-workers.git
+    security_opt:
+      - seccomp=unconfined
+      - apparmor=unconfined
