@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  prebuild:
+    build:
+      context: .
+      dockerfile: prebuild.Dockerfile
+    image: prebuild:latest
+    environment:
+      GIT: https://github.com/clementreiffers/rust-workers.git
+    security_opt:
+      - seccomp=unconfined
+      - apparmor=unconfined

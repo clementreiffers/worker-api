@@ -34,7 +34,7 @@ then you have to put a secret to wrangler to be able to communicate with the DB 
 
 ### Run it
 
-run `npm install -g wrangler` then `npx wranger dev src/index.ts`
+run `npm install -g wrangler` then `npx wranger dev src/index.js`
 
 ## Try inside a docker image
 
@@ -67,7 +67,11 @@ You'll see how to create the cluster with kind with all ports to open and how to
 You can find the kubernetes files in the `kubernetes` folder.
 you can run the command `make build-push-docker` to apply all of them.
 
-if you want to delete all ressources in your cluster, run `make delete-kubernetes-ressources`
+if you want to delete all resources in your cluster, run `make delete-kubernetes-ressources`
+
+### Scaleway
+
+if you push to scaleway, deploy the ingress controller given by them and configure it as a LoadBalancer.
 
 
 ## Explanation
@@ -108,7 +112,7 @@ if you want to test it with a bigger configuration, let's see this
 
 > **Note**
 > By default, there is a limitation of 128 Mo per workers
-> with the worker example `src/index.ts` you can run only approximately 700 workers
+> with the worker example `src/index.js` you can run only approximately 700 workers
 > at the same time instead of 3000 with the worker `worker2/index.js` 
 
 ## Cloud architecture
@@ -225,6 +229,91 @@ flowchart LR
 > - needs a CI/CD => we have to build&test all projects, generate a capnp file and then send it using SSH
 
 
+1st step : send the tar file
+2nd step : give the route api, S3 token api, url S3
+
+### arch v4
+
+```mermaid
+flowchart TB
+   admin --> Git -->|webhook| controller & CRD
+   Git --> |clone| builder
+   builder --> |push| registry --> |pull| workerPod
+    subgraph Kubernetes
+        builder(job pod: download + build + push) --> controller
+        CRD --> controller
+        controller --> deployment
+        deployment --> workerPod --> |GET| secrets
+    end
+    client --> |HTTPS| workerPod
+
+```
+pour les secrets, voir openssl ou gpg pour chiffrer l'executable
+gpg asymétrique donc mieux
+
+### arch v5
+
+```mermaid
+flowchart TB
+    subgraph gits
+        direction TB
+       git1 & git2 & git3
+    end
+     gits --> |webhook| controller
+    subgraph Kubernetes
+       subgraph volumes
+          source-volume & builds-volume & executable
+       end
+       controller --> |start| builders
+        subgraph download-build-push
+            builders --> |mount & clone git| source-volume
+           subgraph builders
+               direction TB
+               builder("clone & build with command given by all wrangler.toml") --> capnp-workerd-generator
+           end
+           builders --> |list workerd capnp| capnp-service-generator
+           capnp-service-generator --> |final capnp|workerd-builder
+           capnp-service-generator --> |push final capnp| builds-volume
+           builders --> |mount| source-volume
+           builders --> |mount & push builds| builds-volume
+           workerd-builder --> |mount| builds-volume
+           workerd-builder --> |mount & push exec| executable
+        end
+        workerd-builder --> |trigger| workerdController
+        workerdController --> |restart| workerdPod
+        workerdPod --> |mount| executable
+        workerdPod --> |get| secrets
+        subgraph workerd-deployment
+            workerdPod
+        end
+    end
+    client --> |https| workerd-deployment
+```
+### arch v6
+
+```mermaid
+flowchart LR
+    admin --> |wrangler| S3
+    client --> |http| ingress
+    subgraph Cloud
+       subgraph Kubernetes
+           ingress --> services 
+           services --> deployments
+           deployments --> workerd-pod
+           HPA --> deployments
+           deployments-controller --> |restart| deployments
+           capnp-generator --> |trigger| workerd-builder-job-pod
+           workerd-builder-job-pod --> |restart| deployments
+            capnp-controller --> |start| capnp-generator
+       end
+       S3 --> |get files| capnp-generator
+       capnp-generator --> |post capnp| S3 
+       S3 --> |trigger| capnp-controller
+       S3 --> |get files & capnp| workerd-builder-job-pod
+    end
+    
+
+```
 
 ## Links
 

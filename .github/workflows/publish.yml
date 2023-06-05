@@ -27,7 +27,7 @@ jobs:
           password: ${{ secrets.TOKEN }}
 
       - name: Building Workerd Container ⚒️
-        run: docker build --tag ghcr.io/clementreiffers/workerd -f workerd.Dockerfile .
+        run: docker build --tag ghcr.io/clementreiffers/workerd -f workerd.prebuild.Dockerfile .
 
       - name: Pushing Workerd Container 🚀
         run: docker push ghcr.io/clementreiffers/workerd

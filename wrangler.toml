@@ -1,4 +1,3 @@
 name = "hello"
-main = "src/index.ts"
+main = "src/worker2/index.js"
 compatibility_date = "2023-04-11"
-

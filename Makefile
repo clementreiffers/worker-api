@@ -7,14 +7,14 @@ wrangler-build:
 build-run-release: clean wrangler-build
 	  npx workerd serve my-config.capnp
 
-build-serv: clean wrangler-build
-	workerd compile my-config.capnp > serv.out
+build-serv: clean #wrangler-build
+	workerd compile old-config.capnp > serv.out
 
 build-run-serv: build-serv
 	./serv.out
 
 build-workerd-docker:
-	#docker build -t $(WORKERD) -f workerd.Dockerfile . --no-cache
+	#docker build -t $(WORKERD) -f workerd.prebuild.Dockerfile . --no-cache
 
 build-docker:
 	docker build --tag=$(IMAGE_NAME) .  --no-cache
