@@ -289,6 +289,31 @@ flowchart TB
     end
     client --> |https| workerd-deployment
 ```
+### arch v6
+
+```mermaid
+flowchart LR
+    admin --> |wrangler| S3
+    client --> |http| ingress
+    subgraph Cloud
+       subgraph Kubernetes
+           ingress --> services 
+           services --> deployments
+           deployments --> workerd-pod
+           HPA --> deployments
+           deployments-controller --> |restart| deployments
+           capnp-generator --> |trigger| workerd-builder-job-pod
+           workerd-builder-job-pod --> |restart| deployments
+            capnp-controller --> |start| capnp-generator
+       end
+       S3 --> |get files| capnp-generator
+       capnp-generator --> |post capnp| S3 
+       S3 --> |trigger| capnp-controller
+       S3 --> |get files & capnp| workerd-builder-job-pod
+    end
+    
+
+```
 
 ## Links
 
