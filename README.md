@@ -297,13 +297,29 @@ flowchart LR
     client --> |http| ingress
     subgraph Cloud
        subgraph Kubernetes
+           subgraph recup
+               S3
+            end
+            subgraph package 
+                capnp-generator 
+                capnp-controller
+                workerd-builder-job-pod
+            end
+            subgraph exec 
+                ingress
+                services
+                deployments
+                workerd-pod
+                HPA
+                deployments-controller
+            end
            ingress --> services 
            services --> deployments
            deployments --> workerd-pod
            HPA --> deployments
            deployments-controller --> |restart| deployments
            capnp-generator --> |trigger| workerd-builder-job-pod
-           workerd-builder-job-pod --> |restart| deployments
+           workerd-builder-job-pod --> |trigger| deployments-controller
             capnp-controller --> |start| capnp-generator
        end
        S3 --> |get files| capnp-generator
@@ -311,8 +327,37 @@ flowchart LR
        S3 --> |trigger| capnp-controller
        S3 --> |get files & capnp| workerd-builder-job-pod
     end
-    
+```
 
+### arch v7
+
+```mermaid
+flowchart TB
+    admin --> |wrangler| fake-cloudflare-api
+    client --> |HTTP| ingress
+    subgraph cloud
+       fake-cloudflare-api --> S3
+       capnp-generator  --> |post capnp| S3
+       S3 --> |get files| capnp-generator
+       subgraph Kubernetes
+           subgraph get-code
+              fake-cloudflare-api
+           end
+           subgraph manage-event
+              fake-cloudflare-api --> |webhook: start capnp| controller
+           end
+           controller --> |start: capnp| capnp-generator 
+           workerd-final-build --> |webhook: start depl| controller
+           subgraph package
+              capnp-generator --> workerd-final-build
+           end
+           controller --> |start: depl| deployments
+           subgraph runner
+              ingress --> services --> deployments --> workerd-pod
+              HPA --> deployments
+           end            
+        end
+    end
 ```
 
 ## Links
