@@ -113,252 +113,74 @@ if you want to test it with a bigger configuration, let's see this
 > **Note**
 > By default, there is a limitation of 128 Mo per workers
 > with the worker example `src/index.js` you can run only approximately 700 workers
-> at the same time instead of 3000 with the worker `worker2/index.js` 
+> at the same time instead of 3000 with the worker `worker2/index.js`
+
 
 ## Cloud architecture
 
-### arch v1
-
-in order to optimize all the process, we can think of a context like that :
-
-```mermaid
-flowchart TB
-    db[(database)] --> workerd-1 --> db
-    
-    admin --> |Set JavaScript / Wasm files using SSH| Volume
-    subgraph Kubernetes-Cluster 
-        subgraph workerd-1
-            worker1
-            worker2
-            worker3
-            worker...
-        end
-        Volume --> |JS / WASM files| workerd-1
-        Volume --> |trigger| w1
-        subgraph workerd-2
-            w1[capnp-generator] --> w2[workerd1-controller]
-        end
-        w2 --> |save Capnp config generated| Volume
-        w2 --> |restart with a new Capnp file| workerd-1
-    end
-    
-    client <--> |HTTP| worker1 & worker2 & worker3 & worker...
-    
-```
-
-this schema could evolve because of workers that can use only HTTP requests.
-To save the capnp file, we will maybe save it into a database fetch-able using HTTP only.
-
-problems :
-- **how to restart workerd-1 with args?**
-
-### arch v2
+The architecture must fulfill the following requirements:
 
 ```mermaid
 flowchart LR
-    admin --> |ssh: JS/Wasm/Capnp| Volume
-    subgraph Kubernetes-Cluster
-        Volume --> |trigger| Killer-Restarter-Pod --> Linux-Depl
-
-        HPA --> |instantiate in another node| Linux-Depl
-
-        subgraph Linux-Depl
-           subgraph Linux-1
-              manager-1 --> |restart docker| workerd-1
-           end
-           subgraph Linux-2
-              manager-2 --> |restart docker| workerd-2 
-           end
-        end
-        workerd-1 & workerd-2 --> |Get Files| Volume
-    end
+    receiver --> builder --> deployer --> runner
 ```
 
-> **Note :**
-> - we don't need any arguments while restarting the Linux-Depl
+### Explanations
 
-> **Warning :**
-> - how to kill / restart pods ?
-> - Less Scalable than Arch V1 due to multiple managers
-> - Consume more resources than V1
+#### receiver
 
-but here we don't need any arguments while restarting the Linux-Depl
+The receiver component is responsible for receiving the code from a client and configuring the Cap'n'Proto 
+file to enable the build process.
 
+#### builder
 
-### arch v3
+The builder component compiles the project for a specific client and prepares it for deployment.
 
-```mermaid
-flowchart LR
-    admin --> |ssh| Volume
-    admin --> |triggered| Volume
-    subgraph Kubernetes-Cluster
-        HPA --> worker-deployment
-      subgraph worker-deployment
-         subgraph workerd-1 
-             direction LR
-             worker1-1
-             worker2-1
-         end
-         subgraph workerd-2
-             direction LR
-             worker1-2
-             worker2-2
-         end
-      end
-   
-      subgraph Volume
-          direction LR
-          config.capnp
-          restarter
-          files
-          capnp-generator
-      end
-      worker-deployment --> |get Files| Volume
-      Volume --> |restart| worker-deployment
-   end
-```
-> **Note :**
-> - all workerd inside the worker-deployment will reed the `config.capnp` file
-> - there is no args because the config has to be `config.capnp` file
-> - The `config.capnp` can be build manually or dynamically
-> - the admin restart the worker-deployment manually => can be automatized by himself if ssh done
-> - More scalable than V2
-> - Less resources than V1 (No Managers & File watcher)
+#### deployer
 
-> **Warning :**
-> - needs a CI/CD => we have to build&test all projects, generate a capnp file and then send it using SSH
+Once the build step is completed, the project is automatically deployed.
 
+#### runner
 
-1st step : send the tar file
-2nd step : give the route api, S3 token api, url S3
+The runner component allows the client to access the results of their build without having to make any changes to 
+the architecture.
 
-### arch v4
+### complete architecture
+
+#### arch v8
 
 ```mermaid
 flowchart TB
-   admin --> Git -->|webhook| controller & CRD
-   Git --> |clone| builder
-   builder --> |push| registry --> |pull| workerPod
-    subgraph Kubernetes
-        builder(job pod: download + build + push) --> controller
-        CRD --> controller
-        controller --> deployment
-        deployment --> workerPod --> |GET| secrets
-    end
-    client --> |HTTPS| workerPod
-
-```
-pour les secrets, voir openssl ou gpg pour chiffrer l'executable
-gpg asymétrique donc mieux
-
-### arch v5
-
-```mermaid
-flowchart TB
-    subgraph gits
-        direction TB
-       git1 & git2 & git3
-    end
-     gits --> |webhook| controller
-    subgraph Kubernetes
-       subgraph volumes
-          source-volume & builds-volume & executable
-       end
-       controller --> |start| builders
-        subgraph download-build-push
-            builders --> |mount & clone git| source-volume
-           subgraph builders
-               direction TB
-               builder("clone & build with command given by all wrangler.toml") --> capnp-workerd-generator
-           end
-           builders --> |list workerd capnp| capnp-service-generator
-           capnp-service-generator --> |final capnp|workerd-builder
-           capnp-service-generator --> |push final capnp| builds-volume
-           builders --> |mount| source-volume
-           builders --> |mount & push builds| builds-volume
-           workerd-builder --> |mount| builds-volume
-           workerd-builder --> |mount & push exec| executable
-        end
-        workerd-builder --> |trigger| workerdController
-        workerdController --> |restart| workerdPod
-        workerdPod --> |mount| executable
-        workerdPod --> |get| secrets
-        subgraph workerd-deployment
-            workerdPod
-        end
-    end
-    client --> |https| workerd-deployment
-```
-### arch v6
-
-```mermaid
-flowchart LR
-    admin --> |wrangler| S3
-    client --> |http| ingress
-    subgraph Cloud
-       subgraph Kubernetes
-           subgraph recup
-               S3
-            end
-            subgraph package 
-                capnp-generator 
-                capnp-controller
-                workerd-builder-job-pod
-            end
-            subgraph exec 
-                ingress
-                services
-                deployments
-                workerd-pod
-                HPA
-                deployments-controller
-            end
-           ingress --> services 
-           services --> deployments
-           deployments --> workerd-pod
-           HPA --> deployments
-           deployments-controller --> |restart| deployments
-           capnp-generator --> |trigger| workerd-builder-job-pod
-           workerd-builder-job-pod --> |trigger| deployments-controller
-            capnp-controller --> |start| capnp-generator
-       end
-       S3 --> |get files| capnp-generator
-       capnp-generator --> |post capnp| S3 
-       S3 --> |trigger| capnp-controller
-       S3 --> |get files & capnp| workerd-builder-job-pod
-    end
-```
-
-### arch v7
-
-```mermaid
-flowchart TB
-    admin --> |wrangler| fake-cloudflare-api
-    client --> |HTTP| ingress
+    admin --> |wrangler publish| fake-cloudflare-api
+    client -->|HTTP| ingress
     subgraph cloud
-       fake-cloudflare-api --> S3
-       capnp-generator  --> |post capnp| S3
-       S3 --> |get files| capnp-generator
+        fake-cloudflare-api & capnp-generator --> |PUT| S3
+        S3 --> |GET| capnp-generator & job-kaniko-image-builder
+
+
        subgraph Kubernetes
-           subgraph get-code
-              fake-cloudflare-api
-           end
-           subgraph manage-event
-              fake-cloudflare-api --> |webhook: start capnp| controller
-           end
-           controller --> |start: capnp| capnp-generator 
-           workerd-final-build --> |webhook: start depl| controller
-           subgraph package
-              capnp-generator --> workerd-final-build
-           end
-           controller --> |start: depl| deployments
-           subgraph runner
-              ingress --> services --> deployments --> workerd-pod
-              HPA --> deployments
-           end            
+            subgraph manage-code 
+                fake-cloudflare-api --> capnp-generator
+            end
+            
+            capnp-generator --> |webhook| job-kaniko-image-builder
+
+           subgraph builder
+               job-kaniko-image-builder
+            end
+
+            job-kaniko-image-builder --> PodInstanciator
+            subgraph deployer
+                PodInstanciator 
+            end
+            PodInstanciator -->|create or update| ingress & service & pod
+            subgraph runner 
+                ingress --> service --> pod
+            end
         end
     end
 ```
+
 
 ## Links
 
