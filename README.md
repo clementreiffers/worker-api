@@ -162,7 +162,7 @@ flowchart TB
 
 
        subgraph Kubernetes
-            subgraph manage-code 
+            subgraph receiver
                 fake-cloudflare-api --> capnp-generator
             end
             
