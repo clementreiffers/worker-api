@@ -124,6 +124,9 @@ The architecture must fulfill the following requirements:
 flowchart LR
     receiver --> builder --> deployer --> runner
 ```
+> **Note**
+> This architecture is designed to facilitate the deployment of JS/Wasm code from a client to a server. 
+> Once this architecture is operational, it needs to be secured.
 
 ### Explanations
 
