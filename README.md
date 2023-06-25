@@ -183,6 +183,78 @@ flowchart TB
         end
     end
 ```
+### arch v9
+
+```mermaid
+flowchart LR
+    subgraph cloud 
+        S3
+       fake-cf-api --> |PUT| S3[(S3)]
+       get-worker-sources -->|GET| S3
+       kaniko --> registry[(registry)] --> pod
+        subgraph Kubernetes 
+            
+            
+            subgraph receiver 
+                fake-cf-api
+            end
+            fake-cf-api --> |create or update| WorkerDefinition
+            fake-cf-api --> |create| WorkerDeployment
+            fake-cf-api --> |create| secrets
+            secrets --> |get| kaniko & pod
+            controller --> |create| job-builder
+            controller --> |watch| WorkerDefinition
+            controller --> |get| WorkerDeployment
+            
+           controller --> |create while job pod done| runner
+            subgraph api-server
+               subgraph secrets
+                  configMap([user-secrets])
+               end
+               subgraph runner
+                  ingress([ingress]) & pod([pod]) & service([service])
+               end
+                WorkerDefinition([WorkerDefinition])--> |references| WorkerDeployment([WorkerDeployment])
+               job-builder([JobBuilder])
+            end
+            job-builder --> pod-builder
+            subgraph pod-builder
+                prebuild[get which worker to be build] --> get-worker-sources --> capnp-generator --> kaniko
+            end
+        end
+    end
+```
+
+WorkerDefinition : 
+- porter le nom du worker 
+- propriétés non versionables d'un worker
+- référencer le WorkerDeployment actif
+
+WorkerDeployment :
+- un pour chaque version d'un worker
+- cred S3
+
+le controller : 
+- watch MAJ WorkerDefinition
+- voir ce qui a été modif?
+  - si depl actif != =>lire WorkerDepl => JobBuilder (modif uniquement ce qui est necessaire si besoin)
+- watch job label "JobBuilder"
+  - si ok => creer/maj runner
+  - sinon => remonter erreur dans WorkerDeployment
+
+fake-api:
+- recois le code
+- genere num version UIDv4
+- upload S3 -> uniq path with numVer
+- create WorkerDepl:
+  - numVer
+  - nomWorker
+- create/update WorkerDef:
+  - update numVer actif
+- ref WorkerDepl
+
+secrets:
+- écrit grâce à la fake-api
 
 
 ## Links
