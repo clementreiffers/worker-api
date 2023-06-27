@@ -150,39 +150,6 @@ the architecture.
 
 ### complete architecture
 
-#### arch v8
-
-```mermaid
-flowchart TB
-    admin --> |wrangler publish| fake-cloudflare-api
-    client -->|HTTP| ingress
-    subgraph cloud
-        fake-cloudflare-api & capnp-generator --> |PUT| S3
-        S3 --> |GET| capnp-generator & job-kaniko-image-builder
-
-
-       subgraph Kubernetes
-            subgraph receiver
-                fake-cloudflare-api --> capnp-generator
-            end
-            
-            capnp-generator --> |webhook| job-kaniko-image-builder
-
-           subgraph builder
-               job-kaniko-image-builder
-            end
-
-            job-kaniko-image-builder --> PodInstanciator
-            subgraph deployer
-                PodInstanciator 
-            end
-            PodInstanciator -->|create or update| ingress & service & pod
-            subgraph runner 
-                ingress --> service --> pod
-            end
-        end
-    end
-```
 ### arch v9
 
 ```mermaid
@@ -222,6 +189,20 @@ flowchart LR
                 prebuild[get which worker to be build] --> get-worker-sources --> capnp-generator --> kaniko
             end
         end
+    end
+```
+
+let's zoom what happened with CRD :
+
+```mermaid
+flowchart LR
+    subgraph Kubernetes
+        fake-cf-api --> WorkerDeployment & WorkerDefinition
+        WorkerDefinition
+        WorkerDeployment
+        WorkerCreator --> |watch| WorkerDefinition & WorkerDeployment
+        WorkerCreator --> |create| runner 
+            
     end
 ```
 
