@@ -195,41 +195,29 @@ flowchart LR
 let's zoom what happened with CRD :
 
 ```mermaid
-flowchart TB
-    subgraph Kubernetes
-        fake-cf-api -->|create| WorkerDeployment & WorkerDefinition & WorkerCreator
-        WorkerCreator .-> |references| WorkerDeployment & WorkerDefinition
-        WorkerCreator --> |create| runner
-        WorkerCreator --> |create| jobBuilder
-        
-        subgraph step
-            jobBuilder
-            subgraph references 
-                WorkerDefinition & WorkerDeployment
-            end
-        end
-    end
-```
-
-```mermaid
 ---
 title: Simple sample
 ---
 stateDiagram-v2
+    state First {
+        JobBuilder
+        Registry
+    }
+    state Second {
+        WorkerDefinition 
+        WorkerDeployment
+    }
     [*] --> FakeCfApi
     FakeCfApi -->  WorkerCreator : accounts,scripts to reload
-    FakeCfApi --> WorkerDefinition : accounts,scripts,creds
-    WorkerDefinition --> WorkerDeployment : references current-depl
-    WorkerCreator --> WorkerDefinition : update
-    WorkerCreator --> WorkerDeployment : create with image,accounts,scripts
+    WorkerDefinition --> WorkerDeployment : references or update current-depl
+    WorkerCreator --> WorkerDefinition : create or update with creds,current-depl
+    WorkerCreator --> WorkerDeployment : create with image,accounts,scripts,active
     WorkerCreator --> JobBuilder : create build
-    WorkerCreator --> Runner : create while build finished
-    Registry --> Runner
-    JobBuilder --> Registry
+    WorkerDeployment --> Runner : create while build finished
+    Registry --> Runner : get image
+    JobBuilder --> Registry : push
     Runner --> [*]
 ```
-
-
 
 WorkerDefinition :
 - porter le nom du worker 
@@ -240,6 +228,7 @@ WorkerDeployment :
 - labels (scripts, accounts)
 - un pour chaque version d'un worker (code Js au sein d'un exec complet)
 - cred S3
+- active : true ça deploie le runner
 
 le controller : 
 - watch MAJ WorkerDefinition
