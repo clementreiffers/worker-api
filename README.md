@@ -195,24 +195,50 @@ flowchart LR
 let's zoom what happened with CRD :
 
 ```mermaid
-flowchart LR
+flowchart TB
     subgraph Kubernetes
-        fake-cf-api --> WorkerDeployment & WorkerDefinition
-        WorkerDefinition
-        WorkerDeployment
-        WorkerCreator --> |watch| WorkerDefinition & WorkerDeployment
-        WorkerCreator --> |create| runner 
-            
+        fake-cf-api -->|create| WorkerDeployment & WorkerDefinition & WorkerCreator
+        WorkerCreator .-> |references| WorkerDeployment & WorkerDefinition
+        WorkerCreator --> |create| runner
+        WorkerCreator --> |create| jobBuilder
+        
+        subgraph step
+            jobBuilder
+            subgraph references 
+                WorkerDefinition & WorkerDeployment
+            end
+        end
     end
 ```
 
-WorkerDefinition : 
+```mermaid
+---
+title: Simple sample
+---
+stateDiagram-v2
+    [*] --> FakeCfApi
+    FakeCfApi -->  WorkerCreator : accounts,scripts to reload
+    FakeCfApi --> WorkerDefinition : accounts,scripts,creds
+    WorkerDefinition --> WorkerDeployment : references current-depl
+    WorkerCreator --> WorkerDefinition : update
+    WorkerCreator --> WorkerDeployment : create with image,accounts,scripts
+    WorkerCreator --> JobBuilder : create build
+    WorkerCreator --> Runner : create while build finished
+    Registry --> Runner
+    JobBuilder --> Registry
+    Runner --> [*]
+```
+
+
+
+WorkerDefinition :
 - porter le nom du worker 
 - propriétés non versionables d'un worker
 - référencer le WorkerDeployment actif
 
 WorkerDeployment :
-- un pour chaque version d'un worker
+- labels (scripts, accounts)
+- un pour chaque version d'un worker (code Js au sein d'un exec complet)
 - cred S3
 
 le controller : 
@@ -247,3 +273,4 @@ secrets:
 - [How to build Rust to WebAssembly for Workerd](https://developer.mozilla.org/en-US/docs/WebAssembly/Rust_to_wasm)
 - [Memory limits](https://community.cloudflare.com/t/workers-memory-limit/491329/2)
 - [HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/)
+
